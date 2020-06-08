@@ -7,6 +7,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.streams.errors.InvalidStateStoreException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import ru.step.store.common.Schemas;
 import ru.step.store.order.mapper.OrderMapper;
 import ru.step.store.common.model.Order;
 import ru.step.store.order.model.OrderCreateRequest;
@@ -19,7 +20,6 @@ import java.util.UUID;
 public class OrderService {
     private static final String ORDERS_STORE_NAME = "order-store";
     final KafkaTemplate<UUID, Order> kafkaTemplate;
-    final NewTopic orderTopic;
 //    final KafkaStreams streams;
 
     public Order getOrder(UUID orderId) {
@@ -42,7 +42,7 @@ public class OrderService {
         log.info("submit order");
          var order = OrderMapper.toOrder(request);
          kafkaTemplate.send(
-                 orderTopic.name(), order.getId(), order
+                 Schemas.Topics.ORDERS.getName(), order.getId(), order
          ).addCallback(result -> {
              if (result != null) {
                  final RecordMetadata recordMetadata = result.getRecordMetadata();

@@ -21,6 +21,7 @@ import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import ru.step.store.common.Schemas;
 import ru.step.store.common.model.Order;
 
 import java.util.Map;
@@ -36,18 +37,11 @@ class KafkaConfig {
 
     @Bean
     NewTopic orderTopic() {
-        return new NewTopic("order-topic", 1, (short) 1);
+        return new NewTopic(Schemas.Topics.ORDERS.getName(), 1, (short) 1);
     }
 
     @Bean
-    NewTopic orderValidationTopic() {
-        return new NewTopic("order-validations", 1, (short) 1);
-    }
-
-    @Bean
-    NewTopic warehouseInventoryTopic() {
-        return new NewTopic("warehouse-inventory", 1, (short) 1);
-    }
+    NewTopic orderValidationTopic() { return new NewTopic(Schemas.Topics.ORDER_VALIDATIONS.getName(), 1, (short) 1); }
 
     @Bean
     ProducerFactory<UUID, Order> producerFactory() {
@@ -75,7 +69,5 @@ class KafkaConfig {
     }
 
     @Bean
-    RecordMessageConverter messageConverter() {
-        return new StringJsonMessageConverter();
-    }
+    RecordMessageConverter messageConverter() { return new StringJsonMessageConverter(); }
 }
