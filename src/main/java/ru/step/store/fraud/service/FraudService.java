@@ -30,7 +30,7 @@ import static ru.step.store.common.model.OrderValidation.OrderValidationType.FRA
 @RequiredArgsConstructor
 public class FraudService {
     private static final int FRAUD_LIMIT = 2000;
-    private static final String APP_ID = "fraud-app";
+    private static final String APP_ID = "fraud-service";
 
     final KafkaStreamsConfiguration baseStreamConfig;
 
@@ -66,6 +66,7 @@ public class FraudService {
                 .filter((k, v) -> v != null)
                 .selectKey((id, orderValue) -> orderValue.getOrder().getId());
 
+        @SuppressWarnings("unchecked")
         final KStream<UUID, OrderValue>[] forks = ordersWithTotal.branch(
                 (id, orderValue) -> orderValue.getTotalValue() >= FRAUD_LIMIT,
                 (id, orderValue) -> orderValue.getTotalValue() < FRAUD_LIMIT);
