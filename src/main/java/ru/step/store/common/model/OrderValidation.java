@@ -12,7 +12,7 @@ public class OrderValidation {
     private OrderValidationType type;
     private OrderValidationResult result;
 
-    public enum OrderValidationType {FRAUD_CHECK}
+    public enum OrderValidationType {FRAUD_CHECK, ORDER_DETAILS_CHECK}
 
     public enum OrderValidationResult {PASS, FAIL}
 }
