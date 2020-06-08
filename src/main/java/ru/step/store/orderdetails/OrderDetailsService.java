@@ -1,4 +1,4 @@
-package ru.step.store.orderdetails.service;
+package ru.step.store.orderdetails;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
