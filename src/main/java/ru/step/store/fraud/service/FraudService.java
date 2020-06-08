@@ -32,8 +32,6 @@ public class FraudService {
     private static final int FRAUD_LIMIT = 2000;
     private static final String APP_ID = "fraud-app";
 
-    final NewTopic orderTopic;
-    final NewTopic orderValidationTopic;
     final KafkaStreamsConfiguration baseStreamConfig;
 
     @EventListener(ApplicationStartedEvent.class)
@@ -47,7 +45,7 @@ public class FraudService {
 
     private StreamsBuilder processStream(StreamsBuilder builder) {
         final KStream<String, Order> orders = builder
-                .stream(orderTopic.name(), Consumed.with(Serdes.String(), Schemas.Topics.ORDERS.getValueSerde()))
+                .stream(Schemas.Topics.ORDERS.getName(), Consumed.with(Serdes.String(), Schemas.Topics.ORDERS.getValueSerde()))
                 .filter((id, order) -> order.getStatus().equals(Order.Status.CREATED));
 
         final KTable<Windowed<UUID>, OrderValue> aggregate = orders
@@ -74,12 +72,12 @@ public class FraudService {
 
         forks[0]
                 .mapValues(orderValue -> new OrderValidation(orderValue.getOrder().getId(), FRAUD_CHECK, FAIL))
-                .to(orderValidationTopic.name(), Produced
+                .to(Schemas.Topics.ORDER_VALIDATIONS.getName(), Produced
                         .with(Serdes.UUID(), Schemas.Topics.ORDER_VALIDATIONS.getValueSerde()));
 
         forks[1]
                 .mapValues(orderValue -> new OrderValidation(orderValue.getOrder().getId(), FRAUD_CHECK, PASS))
-                .to(orderValidationTopic.name(), Produced
+                .to(Schemas.Topics.ORDER_VALIDATIONS.getName(), Produced
                         .with(Serdes.UUID(), Schemas.Topics.ORDER_VALIDATIONS.getValueSerde()));
 
         return builder;
