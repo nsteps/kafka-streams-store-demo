@@ -1,18 +1,21 @@
 package ru.step.store.common.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Order {
-    final private UUID id;
-    final private Status status;
-    final private Product product;
-    final int quantity;
-    final long price;
-    final UUID customerId;
-
+    private UUID id;
+    private Status status;
+    private Product product;
+    private int quantity;
+    private long price;
+    private UUID customerId;
 
     public enum Status {CREATED, VALIDATED, FAILED, SHIPPED}
 
