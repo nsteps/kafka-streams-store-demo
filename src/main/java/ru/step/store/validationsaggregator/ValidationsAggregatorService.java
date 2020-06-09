@@ -1,16 +1,12 @@
 package ru.step.store.validationsaggregator;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.*;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.stereotype.Service;
+import ru.step.store.common.AbstractKStreamService;
 import ru.step.store.common.model.Order;
 import ru.step.store.common.model.OrderValidation;
 
@@ -23,23 +19,16 @@ import static ru.step.store.common.model.OrderValidation.OrderValidationResult.F
 import static ru.step.store.common.model.OrderValidation.OrderValidationResult.PASS;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-public class ValidationsAggregatorService {
+public class ValidationsAggregatorService extends AbstractKStreamService {
     private static final String APP_ID = "validations-aggregator-service";
 
-    final KafkaStreamsConfiguration baseStreamConfig;
-
-    @EventListener(ApplicationStartedEvent.class)
-    public void process() {
-        final var builder = processStream(new StreamsBuilder());
-        final var props = baseStreamConfig.asProperties();
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, APP_ID);
-        final KafkaStreams kafkaStreams = new KafkaStreams(builder.build(), props);
-        kafkaStreams.start();
+    public ValidationsAggregatorService(KafkaStreamsConfiguration baseStreamConfig) {
+        super(baseStreamConfig, APP_ID);
     }
 
-    private StreamsBuilder processStream(StreamsBuilder builder) {
+    @Override
+    public StreamsBuilder processStream(StreamsBuilder builder) {
         final var validationsCount = OrderValidation.OrderValidationType.values().length;
         final KStream<UUID, Order> orders = builder
                 .stream(ORDERS.getName(), Consumed.with(ORDERS.getKeySerde(), ORDERS.getValueSerde()))

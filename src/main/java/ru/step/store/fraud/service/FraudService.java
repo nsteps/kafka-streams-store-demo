@@ -1,21 +1,16 @@
 package ru.step.store.fraud.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.*;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.stereotype.Service;
+import ru.step.store.common.AbstractKStreamService;
 import ru.step.store.common.Schemas;
-import ru.step.store.common.utils.SerdeUtils;
 import ru.step.store.common.model.Order;
 import ru.step.store.common.model.OrderValidation;
+import ru.step.store.common.utils.SerdeUtils;
 import ru.step.store.fraud.model.OrderValue;
 
 import java.time.Duration;
@@ -27,23 +22,16 @@ import static ru.step.store.common.model.OrderValidation.OrderValidationType.FRA
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-public class FraudService {
+public class FraudService extends AbstractKStreamService {
     private static final int FRAUD_LIMIT = 2000;
     private static final String APP_ID = "fraud-service";
 
-    final KafkaStreamsConfiguration baseStreamConfig;
-
-    @EventListener(ApplicationStartedEvent.class)
-    public void process() {
-        final var builder = processStream(new StreamsBuilder());
-        final var props = baseStreamConfig.asProperties();
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, APP_ID);
-        final KafkaStreams kafkaStreams = new KafkaStreams(builder.build(), props);
-        kafkaStreams.start();
+    public FraudService(KafkaStreamsConfiguration baseStreamConfig) {
+        super(baseStreamConfig, APP_ID);
     }
 
-    private StreamsBuilder processStream(StreamsBuilder builder) {
+    @Override
+    public StreamsBuilder processStream(StreamsBuilder builder) {
         final KStream<String, Order> orders = builder
                 .stream(Schemas.Topics.ORDERS.getName(), Consumed.with(Serdes.String(), Schemas.Topics.ORDERS.getValueSerde()))
                 .filter((id, order) -> order.getStatus().equals(Order.Status.CREATED));
@@ -66,8 +54,7 @@ public class FraudService {
                 .filter((k, v) -> v != null)
                 .selectKey((id, orderValue) -> orderValue.getOrder().getId());
 
-        @SuppressWarnings("unchecked")
-        final KStream<UUID, OrderValue>[] forks = ordersWithTotal.branch(
+        @SuppressWarnings("unchecked") final KStream<UUID, OrderValue>[] forks = ordersWithTotal.branch(
                 (id, orderValue) -> orderValue.getTotalValue() >= FRAUD_LIMIT,
                 (id, orderValue) -> orderValue.getTotalValue() < FRAUD_LIMIT);
 
