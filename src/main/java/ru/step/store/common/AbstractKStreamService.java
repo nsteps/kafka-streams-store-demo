@@ -12,7 +12,7 @@ import javax.annotation.PreDestroy;
 public abstract class AbstractKStreamService {
     final String APP_ID;
     final KafkaStreamsConfiguration baseStreamConfig;
-    KafkaStreams kafkaStreams;
+    protected KafkaStreams kafkaStreams;
 
     public abstract StreamsBuilder processStream(StreamsBuilder builder);
 
