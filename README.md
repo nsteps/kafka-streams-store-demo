@@ -5,6 +5,15 @@ The implementation of microservice architecture using kafka as event-streaming p
 Most of the business logic implemented by Kafka Streams stateful operations. All components
 communicate via events in kafka topics.
 
+Order service provides a REST API for creating and getting orders with CQRS style.
+It has local kafka-streams based local store and two type or get queries: 
+get current order state by id and long-pooling get order, which will wait until order 
+will be validated by other services.
+ 
+Orders are validated in parallel by 3 validation services: Fraud, Order details and Warehouse services. 
+After validation has been completed Validations-aggregatos-service aggregate the result and decide
+if order pass or not validation.
+
 ## Architecture
 
 Architecture is described in the great book - Designing event-driven systems by Ben Stopford
