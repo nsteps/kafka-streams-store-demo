@@ -22,6 +22,7 @@ public class Schemas {
     public static class Topics {
         public static Topic<UUID, Order> ORDERS;
         public static Topic<UUID, OrderValidation> ORDER_VALIDATIONS;
+        public static Topic<Order.Product, Integer> WAREHOUSE_INVENTORY;
 
         static {
             createTopics();
@@ -31,6 +32,8 @@ public class Schemas {
             ORDERS = new Topic<>("orders", Serdes.UUID(), SerdeUtils.createJsonSerde(Order.class));
             ORDER_VALIDATIONS = new Topic<>("order-validations", Serdes.UUID(),
                     SerdeUtils.createJsonSerde(OrderValidation.class));
+            WAREHOUSE_INVENTORY = new Topic<>("warehouse-inventory",
+                    SerdeUtils.createJsonSerde(Order.Product.class), Serdes.Integer());
         }
     }
 }

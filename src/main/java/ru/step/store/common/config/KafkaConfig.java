@@ -44,6 +44,9 @@ class KafkaConfig {
     NewTopic orderValidationTopic() { return new NewTopic(Schemas.Topics.ORDER_VALIDATIONS.getName(), 1, (short) 1); }
 
     @Bean
+    NewTopic warehouseInventoryTopic() { return new NewTopic(Schemas.Topics.WAREHOUSE_INVENTORY.getName(), 1, (short) 1); }
+
+    @Bean
     ProducerFactory<UUID, Order> producerFactory() {
         final var props = kafkaProperties.buildConsumerProperties();
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, UUIDSerializer.class);
