@@ -8,6 +8,8 @@ import ru.step.store.common.model.Order;
 import ru.step.store.common.model.OrderValidation;
 import ru.step.store.common.utils.SerdeUtils;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class Schemas {
@@ -20,20 +22,22 @@ public class Schemas {
     }
 
     public static class Topics {
+        public static Set<Topic<?, ?>> ALL = new HashSet<>();
         public static Topic<UUID, Order> ORDERS;
         public static Topic<UUID, OrderValidation> ORDER_VALIDATIONS;
         public static Topic<Order.Product, Integer> WAREHOUSE_INVENTORY;
 
         static {
-            createTopics();
+            ALL.addAll(createTopics());
         }
 
-        private static void createTopics() {
+        private static Set<Topic<?, ?>> createTopics() {
             ORDERS = new Topic<>("orders", Serdes.UUID(), SerdeUtils.createJsonSerde(Order.class));
             ORDER_VALIDATIONS = new Topic<>("order-validations", Serdes.UUID(),
                     SerdeUtils.createJsonSerde(OrderValidation.class));
             WAREHOUSE_INVENTORY = new Topic<>("warehouse-inventory",
                     SerdeUtils.createJsonSerde(Order.Product.class), Serdes.Integer());
+            return Set.of(ORDERS, ORDER_VALIDATIONS, WAREHOUSE_INVENTORY);
         }
     }
 }
