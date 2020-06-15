@@ -28,6 +28,7 @@ System Architecture:
 - fraud-service
 - order-details-service
 - order-validations-aggregate-service
+- warehouse-service
 
 ## How to run
 
