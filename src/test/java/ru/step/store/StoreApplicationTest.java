@@ -2,7 +2,7 @@ package ru.step.store;
 
 import org.junit.jupiter.api.Test;
 
-class StoreApplicationTests extends AbstractIntegrationTest {
+class StoreApplicationTest extends AbstractIntegrationTest {
 
     @Test
     void contextLoads() {
