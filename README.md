@@ -1,7 +1,7 @@
 
 # Kafka streams based store
 
-The implementation of microservice architecture using kafka as event-streaming platform.
+The implementation of microservice architecture using kafka as event-store.
 Most of the business logic implemented by Kafka Streams stateful operations. All components
 communicate via events in kafka topics.
 
